@@ -15,7 +15,7 @@ app.get("/notes", (req,res)=>{
 
 app.get("/api/notes", (req,res)=>{
     let noteData = fs.readFileSync(path.join(__dirname + "/db/db.json"),"utf8");
-    res.json(noteData);
+    res.json(JSON.parse(noteData));
  
 });
 app.post("/api/notes", (req,res)=>{
@@ -29,10 +29,20 @@ app.post("/api/notes", (req,res)=>{
     res.json(newNote)
 
 });
-// app.delete("/api/notes/:id", (req,res)=>{
-//     let noteData = fs.readFileSync(path.join(__dirname + "/db/db.json"),"utf8");
-//     const noteId = req.params.id;
-// })
+app.delete("/api/notes/:id", (req,res)=>{
+    let noteData = fs.readFileSync(path.join(__dirname + "/db/db.json"),"utf8");
+    const noteDataParse = JSON.parse(noteData)
+    const noteId = parseInt(req.params.id);
+
+    let newNote = noteDataParse.filter((note)=>{
+        console.log(note.id ,noteId, note.id===noteId )
+        return note.id !== noteId;
+
+    });
+    fs.writeFileSync(path.join(__dirname + "/db/db.json"),JSON.stringify(newNote))
+ 
+    res.end("This is note has been deleted")
+})
 app.get("*", (req, res)=>{
     res.sendFile(path.join(__dirname + "/public/index.html"));
 });
